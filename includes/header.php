@@ -14,6 +14,7 @@ $currentPage = 'is-active';
 				<div class="navbar-start">
 					<a class="navbar-item <?php echo ($activePage=='project-search.php')?$currentPage:'';?>" href="../tools/project-search.php">project search</a>
 					<a class="navbar-item <?php echo ($activePage=='part-search.php')?$currentPage:'';?>" href="../tools/part-search.php">part search</a>
+					<a class="navbar-item <?php echo ($activePage=='twin-search.php')?$currentPage:'';?>" href="../tools/twin-search.php">twin search</a>
 					<a class="navbar-item <?php echo ($activePage=='dashboard.php')?$currentPage:'';?>" href="../user/dashboard.php">dashboard</a>
     			</div>
     			<div class="navbar-end">

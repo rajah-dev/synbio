@@ -23,6 +23,7 @@ class PartData
   public $scars;
   public $categories;
   public $sequence;
+  public $sequence_sha1;
   public $sequence_length;
   public $ac10;
   public $ac1000;

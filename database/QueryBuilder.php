@@ -56,32 +56,14 @@ class QueryBuilder
             OR (source LIKE :searchTerm)
             OR (sequence LIKE :searchTerm)
             OR (categories LIKE :searchTerm))",
+        "twins" => "WHERE sequence_sha1 = :searchTerm"
         );            
 
     const CLASSSELECT = array(
         "parts" => 'PartData',
         "teamprojects" => 'ProjectData',
         );
-
-    const COLUMNS = array(
-        "parts" => array(
-            'part_name',
-            'part_type',
-            'status',
-            'doc_size',
-            'sequence_length',
-            'uses'
-            ),
-        "teamprojects" => array(
-            'team_name',
-            'year',
-            'section',
-            'track',
-            'medal',
-            )
-        );  
-
-
+ 
 
     //addFiltertoRequest: Used by generateFilterRequest to take checkbox array and implode into MYSQL query
     //Update for later: Use placeholders? Or use whitelist?
@@ -108,13 +90,18 @@ class QueryBuilder
 
     public function generateFullRequest($table, $allFilters) {
 
-    $filterRequest = $this->generateFilterRequest($allFilters); //generate filter part of the statement
+      $filterRequest = $this->generateFilterRequest($allFilters); //generate filter part of the statement
 
-    //Add request portion for filters to sql request
-    $sqlRequest = self::SELECTFROM[$table] . self::SCOPE[$table] . $filterRequest;
-    return $sqlRequest;
+      //Add request portion for filters to sql request
+      $sqlRequest = self::SELECTFROM[$table] . self::SCOPE[$table] . $filterRequest;
+      return $sqlRequest;
     }
 
+    public function generateSimpleRequest($table) {
+
+      $sqlRequest = self::SELECTFROM[$table] . self::SCOPE["twins"] ;
+      return $sqlRequest;
+    }
 
 
 //buildScope: builds the scope of the search, which column the search term gets searched in
@@ -162,6 +149,19 @@ class QueryBuilder
     return $statement->fetchAll(PDO::FETCH_CLASS, self::CLASSSELECT[$table]);
   }
 
+  public function findTwins($table, $searchTerm)
+  {
+    $this->$fullMYSQLquery = $this->generateSimpleRequest($table);
+    
+    //placeholder must represent a complete data literal
+    //with LIKE, we have to prepare our complete literal first, and then send it to the query the usual way:
+    $searchHash = sha1($searchTerm, true);
+
+    $statement = $this->pdo->prepare($this->$fullMYSQLquery);
+
+    $statement->execute(['searchTerm' => $searchHash]);
+    return $statement->fetchAll(PDO::FETCH_CLASS, self::CLASSSELECT[$table]);
+  }
 
 
 }
